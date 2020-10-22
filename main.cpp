@@ -41,7 +41,7 @@ vector<int> bfs(int n, int m, vector<vector<int>> edges, int s) {
             }
         }
     }
-    while(false != nodesToCheck.empty());
+    while(false == nodesToCheck.empty());
 
     vector<int> result;
     result.reserve(n);
@@ -107,7 +107,6 @@ int main()
         }
 
         cout << "\n";
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
     return 0;
