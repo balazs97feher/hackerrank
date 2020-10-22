@@ -20,11 +20,11 @@ int quickestWayUp(vector<vector<int>> ladders, vector<vector<int>> snakes) {
     vector<Square> squares{MaxSquare};
 
     for(auto& ladder : ladders){
-        squares[ladder[0]].ladderTo = ladder[1];
+        squares[ladder[0] - 1].ladderTo = ladder[1] - 1;
     }
 
     for(auto& snake : snakes){
-        squares[snake[0]].snakeTo = snake[1];
+        squares[snake[0] - 1].snakeTo = snake[1] - 1;
     }
 
     list<int> squaresToCheck{};
