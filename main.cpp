@@ -1,4 +1,8 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <limits>
+#include <algorithm>
 
 using namespace std;
 
@@ -12,8 +16,6 @@ vector<int> bfs(int n, int m, vector<vector<int>> edges, int s) {
 
 int main()
 {
-    ofstream fout(getenv("OUTPUT_PATH"));
-
     int q;
     cin >> q;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -46,17 +48,15 @@ int main()
         vector<int> result = bfs(n, m, edges, s);
 
         for (int i = 0; i < result.size(); i++) {
-            fout << result[i];
+            cout << result[i];
 
             if (i != result.size() - 1) {
-                fout << " ";
+                cout << " ";
             }
         }
 
-        fout << "\n";
+        cout << "\n";
     }
-
-    fout.close();
 
     return 0;
 }
