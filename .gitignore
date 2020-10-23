@@ -1,2 +1,4 @@
 program
+program.exe
 *.o
+.vscode
