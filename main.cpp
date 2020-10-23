@@ -47,19 +47,19 @@ vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges);
 int nextRoot(int lastRoot, vector<bool> &visited);
 
 // Complete the roadsAndLibraries function below.
-long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) {
+unsigned long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) {
     if (c_lib <= c_road)
         return n * c_lib;
 
     // calculate number of components with BFS
-    list<long> componentSizes;
+    list<int> componentSizes;
     auto adjList = adjacencyList(n, roads);
     vector<bool> visited(n);
 
     list<int> nodesToCheck;
     int root = nextRoot(-1, visited);
     while (root != -1) {
-        long componentSize = 0;
+        int componentSize = 0;
 
         nodesToCheck.push_back(root);
         visited[root] = true;
@@ -83,7 +83,7 @@ long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) 
         root = nextRoot(root, visited);
     }
 
-    long cost = 0;
+    unsigned long cost = 0;
     for (auto componentSize : componentSizes) {
         cost += (componentSize - 1) * c_road + c_lib;
     }
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        long result = roadsAndLibraries(n, c_lib, c_road, roads);
+        unsigned long result = roadsAndLibraries(n, c_lib, c_road, roads);
 
         cout << result << "\n";
     }
