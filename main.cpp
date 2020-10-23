@@ -11,22 +11,21 @@ using namespace std;
 vector<string> split_string(string);
 vector<vector<int>> mapRoads(int n, vector<vector<int>> &roads);
 vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges);
-int nextRoot(vector<bool> &visited);
+int nextRoot(int lastRoot, vector<bool> &visited);
 
 // Complete the roadsAndLibraries function below.
 long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) {
     if(c_lib <= c_road) return n * c_lib;
     
     // calculate number of components with BFS
+    list<long> componentSizes;
     auto adjList = adjacencyList(n, roads);
     vector<bool> visited(n);
+
     list<int> nodesToCheck;
-
-    list<int> componentSizes;
-
-    int root = nextRoot(visited);
+    int root = nextRoot(-1, visited);
     while(root != -1){
-        int componentSize = 0;
+        long componentSize = 0;
 
         nodesToCheck.push_back(root);
         visited[root] = true;
@@ -48,7 +47,7 @@ long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) 
 
         componentSizes.push_back(componentSize);
 
-        root = nextRoot(visited);
+        root = nextRoot(root, visited);
     }
 
     long cost = 0;
@@ -59,9 +58,12 @@ long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) 
     return cost;
 }
 
-int nextRoot(vector<bool> &visited){
-    for(size_t i = 0; i < visited.size(); i++){
-        if(visited[i] == false) return i;
+int nextRoot(int lastRoot, vector<bool> &visited){
+    for(size_t i = lastRoot + 1; i < visited.size(); i++){
+        if(visited[i] == false){
+            lastRoot = i;
+            return i;
+        }
     }
     
     return -1;
