@@ -42,14 +42,13 @@ class ConsoleReader : public Reader {
 };
 
 vector<string> split_string(string);
-vector<vector<int>> mapRoads(int n, vector<vector<int>> &roads);
 vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges);
 int nextRoot(int lastRoot, vector<bool> &visited);
 
 // Complete the roadsAndLibraries function below.
-unsigned long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) {
+unsigned long long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) {
     if (c_lib <= c_road)
-        return n * c_lib;
+        return static_cast<unsigned long long>(n) * c_lib;
 
     // calculate number of components with BFS
     list<int> componentSizes;
@@ -83,7 +82,7 @@ unsigned long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>
         root = nextRoot(root, visited);
     }
 
-    unsigned long cost = 0;
+    unsigned long long cost = 0;
     for (auto componentSize : componentSizes) {
         cost += (componentSize - 1) * c_road + c_lib;
     }
@@ -144,7 +143,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        unsigned long result = roadsAndLibraries(n, c_lib, c_road, roads);
+        auto result = roadsAndLibraries(n, c_lib, c_road, roads);
 
         cout << result << "\n";
     }
