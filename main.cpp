@@ -1,12 +1,45 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <list>
 #include <map>
+#include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
 using namespace std;
+
+class Reader {
+   public:
+    Reader() {}
+    virtual string getLine() = 0;
+};
+
+class FileReader : public Reader {
+    std::ifstream inputFile;
+
+   public:
+    FileReader(const string fileName) : Reader() {
+        inputFile = ifstream(fileName);
+    }
+    string getLine() override {
+        string line;
+        getline(inputFile, line);
+        return line;
+    }
+};
+
+class ConsoleReader : public Reader {
+   public:
+    ConsoleReader() : Reader() {}
+    string getLine() override {
+        string line;
+        getline(cin, line);
+        return line;
+    }
+};
 
 vector<string> split_string(string);
 vector<vector<int>> mapRoads(int n, vector<vector<int>> &roads);
@@ -77,14 +110,19 @@ vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges) {
     return adjList;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    unique_ptr<Reader> reader;
+    if (argc == 2)
+        reader = unique_ptr<FileReader>(new FileReader(argv[1]));
+    else
+        reader = unique_ptr<ConsoleReader>(new ConsoleReader);
+
     int q;
-    cin >> q;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    stringstream stream(reader->getLine());
+    stream >> q;
 
     for (int q_itr = 0; q_itr < q; q_itr++) {
-        string nmC_libC_road_temp;
-        getline(cin, nmC_libC_road_temp);
+        string nmC_libC_road_temp = reader->getLine();
 
         vector<string> nmC_libC_road = split_string(nmC_libC_road_temp);
 
@@ -100,11 +138,10 @@ int main() {
         for (int i = 0; i < m; i++) {
             roads[i].resize(2);
 
+            stringstream stream(reader->getLine());
             for (int j = 0; j < 2; j++) {
-                cin >> roads[i][j];
+                stream >> roads[i][j];
             }
-
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
 
         long result = roadsAndLibraries(n, c_lib, c_road, roads);
