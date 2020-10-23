@@ -1,10 +1,10 @@
-#include <string>
-#include <vector>
+#include <algorithm>
 #include <iostream>
 #include <limits>
-#include <algorithm>
 #include <list>
 #include <map>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -15,8 +15,9 @@ int nextRoot(int lastRoot, vector<bool> &visited);
 
 // Complete the roadsAndLibraries function below.
 long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) {
-    if(c_lib <= c_road) return n * c_lib;
-    
+    if (c_lib <= c_road)
+        return n * c_lib;
+
     // calculate number of components with BFS
     list<long> componentSizes;
     auto adjList = adjacencyList(n, roads);
@@ -24,26 +25,25 @@ long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) 
 
     list<int> nodesToCheck;
     int root = nextRoot(-1, visited);
-    while(root != -1){
+    while (root != -1) {
         long componentSize = 0;
 
         nodesToCheck.push_back(root);
         visited[root] = true;
 
-        do{
+        do {
             int currentNodeId = nodesToCheck.front();
             nodesToCheck.pop_front();
             componentSize++;
 
-            for(int i = 0; i < adjList[currentNodeId].size(); i++){
+            for (int i = 0; i < adjList[currentNodeId].size(); i++) {
                 int neighberId = adjList[currentNodeId][i];
-                if(false == visited[neighberId]){
+                if (false == visited[neighberId]) {
                     visited[neighberId] = true;
                     nodesToCheck.push_back(neighberId);
                 }
             }
-        }
-        while(false == nodesToCheck.empty());
+        } while (false == nodesToCheck.empty());
 
         componentSizes.push_back(componentSize);
 
@@ -51,28 +51,25 @@ long roadsAndLibraries(int n, int c_lib, int c_road, vector<vector<int>> roads) 
     }
 
     long cost = 0;
-    for(auto componentSize : componentSizes){
+    for (auto componentSize : componentSizes) {
         cost += (componentSize - 1) * c_road + c_lib;
     }
 
     return cost;
 }
 
-int nextRoot(int lastRoot, vector<bool> &visited){
-    for(size_t i = lastRoot + 1; i < visited.size(); i++){
-        if(visited[i] == false){
-            lastRoot = i;
+int nextRoot(int lastRoot, vector<bool> &visited) {
+    for (size_t i = lastRoot + 1; i < visited.size(); i++)
+        if (visited[i] == false)
             return i;
-        }
-    }
-    
+
     return -1;
 }
 
-vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges){
+vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges) {
     vector<vector<int>> adjList(n);
-    
-    for(auto& edge : edges){
+
+    for (auto &edge : edges) {
         adjList[edge[0] - 1].push_back(edge[1] - 1);
         adjList[edge[1] - 1].push_back(edge[0] - 1);
     }
@@ -80,8 +77,7 @@ vector<vector<int>> adjacencyList(int n, vector<vector<int>> &edges){
     return adjList;
 }
 
-int main()
-{
+int main() {
     int q;
     cin >> q;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -120,7 +116,7 @@ int main()
 }
 
 vector<string> split_string(string input_string) {
-    string::iterator new_end = unique(input_string.begin(), input_string.end(), [] (const char &x, const char &y) {
+    string::iterator new_end = unique(input_string.begin(), input_string.end(), [](const char &x, const char &y) {
         return x == y and x == ' ';
     });
 
