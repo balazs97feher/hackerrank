@@ -88,13 +88,11 @@ uint64_t prims(int n, int r, vector<Edge> &edges) {
         } while (spanningTreeVertices.find(cheapestEdge.from) != spanningTreeVertices.end() &&
                  spanningTreeVertices.find(cheapestEdge.to) != spanningTreeVertices.end());
 
-        // cout << "popped :" << cheapestEdge.from << ' ' << cheapestEdge.to << ' ' << cheapestEdge.weight << endl;
         spanningTreeEdges.insert(cheapestEdge.id);
-
-        MSTCost += cheapestEdge.weight;
-
         nextNode = (spanningTreeVertices.find(cheapestEdge.from) == spanningTreeVertices.end()) ? cheapestEdge.from : cheapestEdge.to;
         spanningTreeVertices.insert(nextNode);
+
+        MSTCost += cheapestEdge.weight;
     }
 
     return MSTCost;
