@@ -84,5 +84,9 @@ vector<vector<int>> knightLOnAChessboard(int n) {
 }
 
 int knightL(int n, int a, int b) {
-    return -1;
+    if (a == b) {
+        return ((n - 1) % a == 0) ? (n - 1) / a : -1;
+    }
+
+    return 0;
 }
