@@ -1,10 +1,13 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
+namespace read {
 class Reader {
    public:
     Reader() {}
@@ -34,6 +37,12 @@ class ConsoleReader : public Reader {
         return line;
     }
 };
+}  // namespace read
+
+using namespace read;
+
+vector<vector<int>> knightlOnAChessboard(int n) {
+}
 
 main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -41,6 +50,20 @@ main(int argc, char *argv[]) {
         reader = unique_ptr<FileReader>(new FileReader(argv[1]));
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
+
+    int n;
+    stringstream ss{reader->readLine()};
+    ss >> n;
+
+    vector<vector<int>> result = knightlOnAChessboard(n);
+
+    for (int i = 0; i < result.size(); i++) {
+        for (int j = 0; j < result[i].size(); j++) {
+            cout << result[i][j];
+
+            if (j != result[i].size() - 1) cout << " ";
+        }
+    }
 
     return 0;
 }
