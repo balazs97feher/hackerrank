@@ -1,10 +1,13 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
+namespace reader {
 class Reader {
    public:
     Reader() {}
@@ -34,8 +37,11 @@ class ConsoleReader : public Reader {
         return line;
     }
 };
+}  // namespace reader
 
-main(int argc, char *argv[]) {
+using namespace reader;
+
+int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
         reader = unique_ptr<FileReader>(new FileReader(argv[1]));
