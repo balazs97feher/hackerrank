@@ -41,8 +41,11 @@ class ConsoleReader : public Reader {
 
 using namespace read;
 
-vector<vector<int>> knightLOnAChessboard(int n);
-int knightL(int n, int a, int b);
+static int boardSize;
+vector<vector<int>> knightLOnAChessboard();
+int knightL(int a, int b);
+int getSquareId(int i, int j);
+vector<int> getNeighbors(int i, int j, int a, int b);
 
 main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -51,11 +54,10 @@ main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
-    int n;
     stringstream ss{reader->readLine()};
-    ss >> n;
+    ss >> boardSize;
 
-    vector<vector<int>> result = knightLOnAChessboard(n);
+    vector<vector<int>> result = knightLOnAChessboard();
 
     for (int i = 0; i < result.size(); i++) {
         for (int j = 0; j < result[i].size(); j++) {
@@ -69,13 +71,13 @@ main(int argc, char *argv[]) {
     return 0;
 }
 
-vector<vector<int>> knightLOnAChessboard(int n) {
-    vector<vector<int>> result(n - 1);
-    for (int i = 0; i < n - 1; i++) result[i].resize(n - 1);
+vector<vector<int>> knightLOnAChessboard() {
+    vector<vector<int>> result(boardSize - 1);
+    for (int i = 0; i < boardSize - 1; i++) result[i].resize(boardSize - 1);
 
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = i; j < n - 1; j++) {
-            result[i][j] = knightL(n, i + 1, j + 1);
+    for (int i = 0; i < boardSize - 1; i++) {
+        for (int j = i; j < boardSize - 1; j++) {
+            result[i][j] = knightL(i + 1, j + 1);
             result[j][i] = result[i][j];
         }
     }
@@ -83,10 +85,24 @@ vector<vector<int>> knightLOnAChessboard(int n) {
     return result;
 }
 
-int knightL(int n, int a, int b) {
+int knightL(int a, int b) {
     if (a == b) {
-        return ((n - 1) % a == 0) ? (n - 1) / a : -1;
+        return ((boardSize - 1) % a == 0) ? (boardSize - 1) / a : -1;
+    }
+
+    vector<vector<int>> board(boardSize);
+    for (int i = 0; i < boardSize; i++) {
+        board[i].resize(boardSize);
+        for (int j = 0; j < boardSize; j++) board[i][j] = -1;
     }
 
     return 0;
+}
+
+int getSquareId(int i, int j) {
+    if (i >= 0 && i < boardSize && j >= 0 && j < boardSize) return i * boardSize + j;
+    return -1;
+}
+
+vector<int> getNeighbors(int i, int j, int a, int b) {
 }
