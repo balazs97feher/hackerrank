@@ -41,8 +41,8 @@ class ConsoleReader : public Reader {
 
 using namespace read;
 
-vector<vector<int>> knightlOnAChessboard(int n) {
-}
+vector<vector<int>> knightLOnAChessboard(int n);
+int knightL(int n, int a, int b);
 
 main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -55,7 +55,7 @@ main(int argc, char *argv[]) {
     stringstream ss{reader->readLine()};
     ss >> n;
 
-    vector<vector<int>> result = knightlOnAChessboard(n);
+    vector<vector<int>> result = knightLOnAChessboard(n);
 
     for (int i = 0; i < result.size(); i++) {
         for (int j = 0; j < result[i].size(); j++) {
@@ -63,7 +63,24 @@ main(int argc, char *argv[]) {
 
             if (j != result[i].size() - 1) cout << " ";
         }
+        cout << endl;
     }
 
     return 0;
+}
+
+vector<vector<int>> knightLOnAChessboard(int n) {
+    vector<vector<int>> result(n - 1);
+    for (int i = 0; i < n - 1; i++) {
+        result[i].resize(n - 1);
+        for (int j = 0; j < n - 1; j++) {
+            result[i][j] = knightL(n, i + 1, j + 1);
+        }
+    }
+
+    return result;
+}
+
+int knightL(int n, int a, int b) {
+    return -1;
 }
