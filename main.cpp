@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -45,9 +46,9 @@ static int boardSize;
 vector<vector<int>> knightLOnAChessboard();
 int knightL(int a, int b);
 int getSquareId(int i, int j);
-vector<int> getNeighbors(int i, int j, int a, int b);
+vector<int> getNeighbors(int squareId, int a, int b);
 
-main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
         reader = unique_ptr<FileReader>(new FileReader(argv[1]));
@@ -90,13 +91,26 @@ int knightL(int a, int b) {
         return ((boardSize - 1) % a == 0) ? (boardSize - 1) / a : -1;
     }
 
-    vector<vector<int>> board(boardSize);
-    for (int i = 0; i < boardSize; i++) {
-        board[i].resize(boardSize);
-        for (int j = 0; j < boardSize; j++) board[i][j] = -1;
-    }
+    vector<int> board(boardSize * boardSize);  // stores the minimum number of steps to reach a square from 0,0
+    for (auto &square : board) square = -1;
 
-    return 0;
+    list<int> squaresToCheck{0};
+    board[0] = 0;  // BFS from 0,0
+    do {
+        int currentSquare = squaresToCheck.front();
+        squaresToCheck.pop_front();
+
+        auto neighbors = getNeighbors(currentSquare, a, b);
+        for (auto neighbor : neighbors) {
+            if (board[neighbor] == -1) {
+                board[neighbor] = board[currentSquare] + 1;
+                squaresToCheck.push_back(neighbor);
+            }
+        }
+
+    } while (false == squaresToCheck.empty());
+
+    return board[boardSize * boardSize - 1];
 }
 
 int getSquareId(int i, int j) {
@@ -104,5 +118,20 @@ int getSquareId(int i, int j) {
     return -1;
 }
 
-vector<int> getNeighbors(int i, int j, int a, int b) {
+vector<int> getNeighbors(int squareId, int a, int b) {
+    int i = squareId / boardSize;
+    int j = squareId % boardSize;
+
+    const vector<int> stepsi{a, a, -a, -a, b, b, -b, -b};
+    const vector<int> stepsj{b, -b, b, -b, a, -a, a, -b};
+
+    vector<int> neighbors;
+    neighbors.reserve(8);
+
+    for (int k = 0; k < 8; k++) {
+        int neighbor = getSquareId(i + stepsi[k], j + stepsj[k]);
+        if (neighbor != -1) neighbors.push_back(neighbor);
+    }
+
+    return neighbors;
 }
