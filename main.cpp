@@ -71,10 +71,12 @@ main(int argc, char *argv[]) {
 
 vector<vector<int>> knightLOnAChessboard(int n) {
     vector<vector<int>> result(n - 1);
+    for (int i = 0; i < n - 1; i++) result[i].resize(n - 1);
+
     for (int i = 0; i < n - 1; i++) {
-        result[i].resize(n - 1);
-        for (int j = 0; j < n - 1; j++) {
+        for (int j = i; j < n - 1; j++) {
             result[i][j] = knightL(n, i + 1, j + 1);
+            result[j][i] = result[i][j];
         }
     }
 
