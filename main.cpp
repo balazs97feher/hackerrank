@@ -123,7 +123,7 @@ vector<int> getNeighbors(int squareId, int a, int b) {
     int j = squareId % boardSize;
 
     const vector<int> stepsi{a, a, -a, -a, b, b, -b, -b};
-    const vector<int> stepsj{b, -b, b, -b, a, -a, a, -b};
+    const vector<int> stepsj{b, -b, b, -b, a, -a, a, -a};
 
     vector<int> neighbors;
     neighbors.reserve(8);
