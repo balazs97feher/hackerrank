@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -41,7 +42,9 @@ class ConsoleReader : public Reader {
 
 using namespace reader;
 
-long getWays(int n, const vector<int> &coins);
+static vector<int> coins;
+
+long getWays(int amount, int nextCoin);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -51,19 +54,35 @@ int main(int argc, char *argv[]) {
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
     stringstream stream{reader->readLine()};
-    int n, m;
-    stream >> n >> m;
+    int amount, m;
+    stream >> amount >> m;
 
-    vector<int> coins(m);
+    coins.resize(m);
     stream = stringstream{reader->readLine()};
     for (int i = 0; i < m; i++) stream >> coins[i];
+    sort(coins.begin(), coins.end(), std::greater<int>());
 
-    auto result = getWays(n, coins);
+    auto result = getWays(amount, 0);
     cout << result;
 
     return 0;
 }
 
-long getWays(int n, const vector<int> &coins) {
-    return 0;
+long getWays(int amount, int nextCoin) {
+    if (amount == 0) return 1;
+
+    long ways = 0;
+
+    if (nextCoin == coins.size() - 1) {
+        if (amount % coins[nextCoin] == 0) return 1;
+        return 0;
+    }
+
+    ways += getWays(amount, nextCoin + 1);
+    while (amount >= coins[nextCoin]) {
+        amount = amount - coins[nextCoin];
+        ways += getWays(amount, nextCoin + 1);
+    }
+
+    return ways;
 }
