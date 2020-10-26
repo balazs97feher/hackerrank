@@ -41,6 +41,8 @@ class ConsoleReader : public Reader {
 
 using namespace reader;
 
+long getWays(int n, const vector<int> &coins);
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -48,5 +50,20 @@ int main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
+    stringstream stream{reader->readLine()};
+    int n, m;
+    stream >> n >> m;
+
+    vector<int> coins(m);
+    stream = stringstream{reader->readLine()};
+    for (int i = 0; i < m; i++) stream >> coins[i];
+
+    auto result = getWays(n, coins);
+    cout << result;
+
+    return 0;
+}
+
+long getWays(int n, const vector<int> &coins) {
     return 0;
 }
