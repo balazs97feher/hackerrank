@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -43,6 +45,7 @@ class ConsoleReader : public Reader {
 using namespace reader;
 
 static vector<int> coins;
+static unordered_map<string, long> cache;
 
 long getWays(int amount, int nextCoin);
 
@@ -71,18 +74,24 @@ int main(int argc, char *argv[]) {
 long getWays(int amount, int nextCoin) {
     if (amount == 0) return 1;
 
-    long ways = 0;
-
     if (nextCoin == coins.size() - 1) {
         if (amount % coins[nextCoin] == 0) return 1;
         return 0;
     }
 
-    ways += getWays(amount, nextCoin + 1);
-    while (amount >= coins[nextCoin]) {
-        amount = amount - coins[nextCoin];
-        ways += getWays(amount, nextCoin + 1);
+    string key = to_string(amount) + "_" + to_string(nextCoin);
+
+    auto cacheEntry = cache.find(key);
+    if (cacheEntry != cache.end()) return cacheEntry->second;
+
+    long ways = 0;
+    int copyOfAmount = amount;
+    ways += getWays(copyOfAmount, nextCoin + 1);
+    while (copyOfAmount >= coins[nextCoin]) {
+        copyOfAmount = copyOfAmount - coins[nextCoin];
+        ways += getWays(copyOfAmount, nextCoin + 1);
     }
 
+    cache.emplace(make_pair(key, ways));
     return ways;
 }
