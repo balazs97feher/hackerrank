@@ -44,7 +44,7 @@ class ConsoleReader : public Reader {
 
 using namespace reader;
 
-list<unordered_set<uint32_t>>::iterator findAstronaut(uint32_t astronaut, list<unordered_set<uint32_t>> &countries);
+int32_t findCountries(const uint32_t astronaut, const vector<unordered_set<uint32_t>> &countries);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -54,10 +54,11 @@ int main(int argc, char *argv[]) {
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
     stringstream stream{reader->readLine()};
-    int n, p;
+    uint32_t n, p;
     stream >> n >> p;
 
-    list<unordered_set<uint32_t>> countries;
+    vector<unordered_set<uint32_t>> countries;
+    countries.reserve(n / 2);
     vector<bool> belongsToACountry(n);
 
     for (int i = 0; i < p; i++) {
@@ -65,42 +66,46 @@ int main(int argc, char *argv[]) {
         uint32_t astronaut1, astronaut2;
         stream >> astronaut1 >> astronaut2;
 
-        auto country = findAstronaut(astronaut1, countries);
-        if (country != countries.end()) {
-            country->insert(astronaut2);
-        } else {
-            country = findAstronaut(astronaut2, countries);
-            if (country != countries.end()) {
-                country->insert(astronaut1);
-            } else {
-                countries.emplace_back(unordered_set<uint32_t>{astronaut1, astronaut2});
-            }
-        }
         belongsToACountry[astronaut1] = true;
         belongsToACountry[astronaut2] = true;
+
+        auto homeCountry1 = findCountries(astronaut1, countries);
+        auto homeCountry2 = findCountries(astronaut2, countries);
+
+        if (homeCountry1 == -1 && homeCountry2 == -1) {
+            countries.emplace_back(unordered_set<uint32_t>{astronaut1, astronaut2});
+        } else if (homeCountry1 == -1) {
+            countries[homeCountry2].insert(astronaut1);
+        } else if (homeCountry2 == -1) {
+            countries[homeCountry1].insert(astronaut2);
+        } else {
+            for (auto astronaut : countries[homeCountry2]) countries[homeCountry1].insert(astronaut);
+            countries[homeCountry2].clear();
+        }
     }
-    uint32_t lonerCount = count(belongsToACountry.begin(), belongsToACountry.end(), false);
+    int32_t lonerCount = count(belongsToACountry.begin(), belongsToACountry.end(), false);
 
-    vector<uint32_t> population(countries.size() + 1);
-    int id = 0;
-    for (auto &country : countries) population[id++] = country.size();
-    population[id] = lonerCount;
+    vector<uint32_t> populations(countries.size() + 1);
+    for (int i = 0; i < countries.size(); i++) populations[i] = countries[i].size();
+    populations[countries.size()] = lonerCount;
 
-    uint64_t pairCount = 0;
+    uint64_t matchCount = 0;
+    for (uint32_t i = 0; i < populations.size() - 1; i++) {
+        for (uint32_t j = i + 1; j < populations.size(); j++) {
+            matchCount += populations[i] * populations[j];
+        }
+    }
+    matchCount += (lonerCount * (lonerCount - 1)) / 2;
 
-    for (int i = 0; i < population.size() - 1; i++)
-        for (int j = i + 1; j < population.size(); j++) pairCount += (uint64_t)population[i] * population[j];
-
-    pairCount += (population[id] * (population[id] - 1)) / 2;
-
-    cout << pairCount << endl;
+    cout << matchCount << endl;
 
     return 0;
 }
 
-list<unordered_set<uint32_t>>::iterator findAstronaut(uint32_t astronaut, list<unordered_set<uint32_t>> &countries) {
-    for (auto country = countries.begin(); country != countries.end(); country++)
-        if (country->find(astronaut) != country->end()) return country;
+int32_t findCountries(const uint32_t astronaut, const vector<unordered_set<uint32_t>> &countries) {
+    for (int32_t i = 0; i < countries.size(); i++) {
+        if (countries[i].find(astronaut) != countries[i].end()) return i;
+    }
 
-    return countries.end();
+    return -1;
 }
