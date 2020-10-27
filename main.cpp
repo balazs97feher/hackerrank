@@ -79,14 +79,21 @@ int main(int argc, char *argv[]) {
         belongsToACountry[astronaut1] = true;
         belongsToACountry[astronaut2] = true;
     }
-
     uint32_t lonerCount = count(belongsToACountry.begin(), belongsToACountry.end(), false);
 
-    for (auto &country : countries) {
-        for (auto astronaut : country) cout << astronaut << ' ';
-        cout << endl;
-    }
-    cout << lonerCount << endl;
+    vector<uint32_t> population(countries.size() + 1);
+    int id = 0;
+    for (auto &country : countries) population[id++] = country.size();
+    population[id] = lonerCount;
+
+    uint64_t pairCount = 0;
+
+    for (int i = 0; i < population.size() - 1; i++)
+        for (int j = i + 1; j < population.size(); j++) pairCount += (uint64_t)population[i] * population[j];
+
+    pairCount += (population[id] * (population[id] - 1)) / 2;
+
+    cout << pairCount << endl;
 
     return 0;
 }
