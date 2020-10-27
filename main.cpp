@@ -10,7 +10,7 @@ using namespace std;
 namespace reader {
 class Reader {
    public:
-    Reader() {}
+    Reader() = default;
     virtual string readLine() = 0;
 };
 
@@ -30,7 +30,7 @@ class FileReader : public Reader {
 
 class ConsoleReader : public Reader {
    public:
-    ConsoleReader() : Reader() {}
+    ConsoleReader() = default;
     string readLine() override {
         string line;
         getline(cin, line);
