@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -57,22 +58,36 @@ int main(int argc, char *argv[]) {
     stream >> n >> p;
 
     list<unordered_set<uint32_t>> countries;
+    vector<bool> belongsToACountry(n);
 
     for (int i = 0; i < p; i++) {
-        stream.str(reader->readLine());
+        stream = stringstream{reader->readLine()};
         uint32_t astronaut1, astronaut2;
         stream >> astronaut1 >> astronaut2;
 
         auto country = findAstronaut(astronaut1, countries);
-        if (country == countries.end()) country = findAstronaut(astronaut2, countries);
-        if (country == countries.end()) {
-            countries.emplace_back(unordered_set<uint32_t>{astronaut1, astronaut2});
+        if (country != countries.end()) {
+            country->insert(astronaut2);
         } else {
-            country->insert({astronaut1, astronaut2});
+            country = findAstronaut(astronaut2, countries);
+            if (country != countries.end()) {
+                country->insert(astronaut1);
+            } else {
+                countries.emplace_back(unordered_set<uint32_t>{astronaut1, astronaut2});
+            }
         }
+        belongsToACountry[astronaut1] = true;
+        belongsToACountry[astronaut2] = true;
     }
 
-    
+    uint32_t lonerCount = count(belongsToACountry.begin(), belongsToACountry.end(), false);
+
+    for (auto &country : countries) {
+        for (auto astronaut : country) cout << astronaut << ' ';
+        cout << endl;
+    }
+    cout << lonerCount << endl;
+
     return 0;
 }
 
