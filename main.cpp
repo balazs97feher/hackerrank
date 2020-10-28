@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -43,6 +44,16 @@ using namespace reader;
 
 static const int kPuzzleSize = 10;
 
+struct WordStart {
+    enum Direction { kRight,
+                     kDown } direction;
+    int y, x, length;
+
+    WordStart(int y, int x, int length, Direction dir) : y(y), x(x), length(length), direction(dir) {}
+};
+
+vector<WordStart> findStartFields(const vector<vector<char>> &puzzle);
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -58,10 +69,51 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < kPuzzleSize; j++) puzzle[i][j] = stream.get();
     }
 
-    // for (auto row : puzzle) {
-    //     for (auto c : row) cout << c;
-    //     cout << endl;
-    // }
+    auto startFields = findStartFields(puzzle);
+
+    for (auto &start : startFields) {
+        cout << start.y << ' ' << start.x << ' ' << start.length << endl;
+    }
 
     return 0;
+}
+
+vector<WordStart> findStartFields(const vector<vector<char>> &puzzle) {
+    vector<WordStart> startFields;
+
+    for (int i = 0; i < kPuzzleSize; i++) {
+        int j = 0;
+        while (j < kPuzzleSize - 1) {
+            if (puzzle[i][j] == '-' && puzzle[i][j + 1] == '-') {
+                int length = 0;
+                WordStart start(i, j, 0, WordStart::Direction::kRight);
+                while (j < kPuzzleSize && puzzle[i][j] == '-') {
+                    j++;
+                    length++;
+                }
+                start.length = length;
+                startFields.push_back(start);
+            }
+            j++;
+        }
+    }
+
+    for (int j = 0; j < kPuzzleSize; j++) {
+        int i = 0;
+        while (i < kPuzzleSize - 1) {
+            if (puzzle[i][j] == '-' && puzzle[i + 1][j] == '-') {
+                int length = 0;
+                WordStart start(i, j, 0, WordStart::Direction::kDown);
+                while (i < kPuzzleSize && puzzle[i][j] == '-') {
+                    i++;
+                    length++;
+                }
+                start.length = length;
+                startFields.push_back(start);
+            }
+            i++;
+        }
+    }
+
+    return startFields;
 }
