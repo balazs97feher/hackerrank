@@ -53,6 +53,7 @@ struct WordStart {
 };
 
 vector<WordStart> findStartFields(const vector<vector<char>> &puzzle);
+vector<string> parseWords(string wordList);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -69,11 +70,13 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < kPuzzleSize; j++) puzzle[i][j] = stream.get();
     }
 
-    auto startFields = findStartFields(puzzle);
+    auto words = parseWords(reader->readLine());
 
-    for (auto &start : startFields) {
-        cout << start.y << ' ' << start.x << ' ' << start.length << endl;
-    }
+    // auto startFields = findStartFields(puzzle);
+
+    // for (auto &start : startFields) {
+    //     cout << start.y << ' ' << start.x << ' ' << start.length << endl;
+    // }
 
     return 0;
 }
@@ -116,4 +119,19 @@ vector<WordStart> findStartFields(const vector<vector<char>> &puzzle) {
     }
 
     return startFields;
+}
+
+vector<string> parseWords(string wordList) {
+    vector<string> words;
+    size_t pos = 0;
+    string token;
+
+    while ((pos = wordList.find(';')) != string::npos) {
+        token = wordList.substr(0, pos);
+        words.push_back(token);
+        wordList.erase(0, pos + 1);
+    }
+    words.push_back(wordList);
+
+    return words;
 }
