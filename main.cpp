@@ -41,12 +41,27 @@ class ConsoleReader : public Reader {
 
 using namespace reader;
 
+static const int kPuzzleSize = 10;
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
         reader = unique_ptr<FileReader>(new FileReader(argv[1]));
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
+
+    vector<vector<char>> puzzle(kPuzzleSize);
+    for (int i = 0; i < kPuzzleSize; i++) {
+        puzzle[i].resize(kPuzzleSize);
+
+        stringstream stream{reader->readLine()};
+        for (int j = 0; j < kPuzzleSize; j++) puzzle[i][j] = stream.get();
+    }
+
+    // for (auto row : puzzle) {
+    //     for (auto c : row) cout << c;
+    //     cout << endl;
+    // }
 
     return 0;
 }
