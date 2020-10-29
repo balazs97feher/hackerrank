@@ -148,21 +148,21 @@ vector<WordStart> findStartFields(const vector<vector<char>> &puzzle) {
 
 vector<vector<char>> solvePuzzle(const vector<vector<char>> &puzzle, int nextStart) {
     if (nextStart == startFields.size()) return puzzle;
+    // cout << "next> " << nextStart << endl;
 
     for (int i = 0; i < used.size(); i++) {
         if (used[i] == false && startFields[nextStart].length == words[i].size()) {
             vector<vector<char>> filledPuzzle(puzzle);
-            cout << words[i] << endl;
             if (writeWord(filledPuzzle, words[i], startFields[nextStart]) == true) {
                 used[i] = true;
 
                 //debug
-                for (auto &row : filledPuzzle) {
-                    for (auto field : row) cout << field;
-                    cout << endl;
-                }
+                // for (auto &row : filledPuzzle) {
+                //     for (auto field : row) cout << field;
+                //     cout << endl;
+                // }
 
-                auto solved = solvePuzzle(filledPuzzle, nextStart++);
+                auto solved = solvePuzzle(filledPuzzle, ++nextStart);
                 if (solved.empty() == false)
                     return solved;
                 else {
