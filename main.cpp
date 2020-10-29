@@ -43,6 +43,8 @@ class ConsoleReader : public Reader {
 using namespace reader;
 
 static const int kPuzzleSize = 10;
+static vector<string> words;
+static vector<bool> used;
 
 struct WordStart {
     enum Direction { kRight,
@@ -52,8 +54,12 @@ struct WordStart {
     WordStart(int y, int x, int length, Direction dir) : y(y), x(x), length(length), direction(dir) {}
 };
 
+static vector<WordStart> startFields;
+
 vector<WordStart> findStartFields(const vector<vector<char>> &puzzle);
 vector<string> parseWords(string wordList);
+vector<vector<char>> solvePuzzle(const vector<vector<char>> &puzzle, int nextStart);
+bool writeWord(vector<vector<char>> &puzzle, const string &word, const WordStart &start);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -62,7 +68,8 @@ int main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
-    vector<vector<char>> puzzle(kPuzzleSize);
+    vector<vector<char>> puzzle;
+    puzzle.resize(kPuzzleSize);
     for (int i = 0; i < kPuzzleSize; i++) {
         puzzle[i].resize(kPuzzleSize);
 
@@ -70,15 +77,33 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < kPuzzleSize; j++) puzzle[i][j] = stream.get();
     }
 
-    auto words = parseWords(reader->readLine());
+    words = parseWords(reader->readLine());
 
-    // auto startFields = findStartFields(puzzle);
+    startFields = findStartFields(puzzle);
+    used.resize(words.size());
+    auto result = solvePuzzle(puzzle, 0);
 
-    // for (auto &start : startFields) {
-    //     cout << start.y << ' ' << start.x << ' ' << start.length << endl;
-    // }
+    for (auto &row : result) {
+        for (auto field : row) cout << field;
+        cout << endl;
+    }
 
     return 0;
+}
+
+vector<string> parseWords(string wordList) {
+    vector<string> words;
+    size_t pos = 0;
+    string token;
+
+    while ((pos = wordList.find(';')) != string::npos) {
+        token = wordList.substr(0, pos);
+        words.push_back(token);
+        wordList.erase(0, pos + 1);
+    }
+    words.push_back(wordList);
+
+    return words;
 }
 
 vector<WordStart> findStartFields(const vector<vector<char>> &puzzle) {
@@ -121,17 +146,65 @@ vector<WordStart> findStartFields(const vector<vector<char>> &puzzle) {
     return startFields;
 }
 
-vector<string> parseWords(string wordList) {
-    vector<string> words;
-    size_t pos = 0;
-    string token;
+vector<vector<char>> solvePuzzle(const vector<vector<char>> &puzzle, int nextStart) {
+    if (nextStart == startFields.size()) return puzzle;
 
-    while ((pos = wordList.find(';')) != string::npos) {
-        token = wordList.substr(0, pos);
-        words.push_back(token);
-        wordList.erase(0, pos + 1);
+    for (int i = 0; i < used.size(); i++) {
+        if (used[i] == false && startFields[nextStart].length == words[i].size()) {
+            vector<vector<char>> filledPuzzle(puzzle);
+            cout << words[i] << endl;
+            if (writeWord(filledPuzzle, words[i], startFields[nextStart]) == true) {
+                used[i] = true;
+
+                //debug
+                for (auto &row : filledPuzzle) {
+                    for (auto field : row) cout << field;
+                    cout << endl;
+                }
+
+                auto solved = solvePuzzle(filledPuzzle, nextStart++);
+                if (solved.empty() == false)
+                    return solved;
+                else {
+                    nextStart--;
+                    used[i] = false;
+                }
+            }
+        }
     }
-    words.push_back(wordList);
 
-    return words;
+    vector<vector<char>> empty;
+    return empty;
+}
+
+bool writeWord(vector<vector<char>> &puzzle, const string &word, const WordStart &start) {
+    int i = start.y;
+    int j = start.x;
+
+    if (start.direction == WordStart::Direction::kRight) {
+        while (j < start.x + word.size()) {
+            if (puzzle[i][j] != '-' && puzzle[i][j] != word[j - start.x]) break;
+            j++;
+        }
+        if (j != start.x + word.size()) return false;
+
+        j = start.x;
+        while (j < start.x + word.size()) {
+            puzzle[i][j] = word[j - start.x];
+            j++;
+        }
+        return true;
+    } else {
+        while (i < start.y + word.size()) {
+            if (puzzle[i][j] != '-' && puzzle[i][j] != word[i - start.y]) break;
+            i++;
+        }
+        if (i != start.y + word.size()) return false;
+        i = start.y;
+        while (i < start.y + word.size()) {
+            puzzle[i][j] = word[i - start.y];
+            i++;
+        }
+        return true;
+    }
 }
