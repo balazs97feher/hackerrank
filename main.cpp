@@ -41,6 +41,14 @@ class ConsoleReader : public Reader {
 
 using namespace reader;
 
+struct Vertex {
+    bool visited;
+    int subTreeSize;
+};
+
+vector<vector<int>> adjacencyList(const int n, const vector<vector<int>> &edges);
+int evenForest(const int n, const vector<vector<int>> &edges);
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -58,6 +66,24 @@ int main(int argc, char *argv[]) {
         stream = stringstream(reader->readLine());
         stream >> edges[i][0] >> edges[i][1];
     }
+
+    return 0;
+}
+
+vector<vector<int>> adjacencyList(const int n, const vector<vector<int>> &edges) {
+    vector<vector<int>> adjList(n);
+
+    for (auto &edge : edges) {
+        adjList[edge[0] - 1].push_back(edge[1] - 1);
+        adjList[edge[1] - 1].push_back(edge[0] - 1);
+    }
+
+    return adjList;
+}
+
+int evenForest(const int n, const vector<vector<int>> &edges) {
+    auto adjList = adjacencyList(n, edges);
+    vector<Vertex> vertices(n);
 
     return 0;
 }
