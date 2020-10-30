@@ -50,6 +50,8 @@ vector<vector<int>> adjacencyList(const int n, const vector<vector<int>> &edges)
 int evenForest(const int n, const vector<vector<int>> &edges);
 int DFS(const int root, vector<Vertex> &vertices, const vector<vector<int>> &edges);
 
+static int numberOfRemovedEdges = 0;
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -90,6 +92,8 @@ int evenForest(const int n, const vector<vector<int>> &edges) {
 
     DFS(0, vertices, adjList);
 
+    cout << numberOfRemovedEdges << endl;
+
     return 0;
 }
 
@@ -99,7 +103,11 @@ int DFS(const int root, vector<Vertex> &vertices, const vector<vector<int>> &adj
 
     for (auto neighbor : adjList[root]) {
         if (vertices[neighbor].visited == false) {
-            subTreeSize += DFS(neighbor, vertices, adjList);
+            int neighborSubTreeSize = DFS(neighbor, vertices, adjList);
+            if (neighborSubTreeSize % 2 == 0)
+                numberOfRemovedEdges++;
+            else
+                subTreeSize += neighborSubTreeSize;
         }
     }
     vertices[root].subTreeSize = subTreeSize;
