@@ -48,5 +48,16 @@ int main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
+    int n, m;
+    stringstream stream{reader->readLine()};
+    stream >> n >> m;
+
+    vector<vector<int>> edges(m);
+    for (int i = 0; i < m; i++) {
+        edges[i].resize(2);
+        stream = stringstream(reader->readLine());
+        stream >> edges[i][0] >> edges[i][1];
+    }
+
     return 0;
 }
