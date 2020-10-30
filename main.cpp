@@ -48,6 +48,7 @@ struct Vertex {
 
 vector<vector<int>> adjacencyList(const int n, const vector<vector<int>> &edges);
 int evenForest(const int n, const vector<vector<int>> &edges);
+int DFS(const int root, vector<Vertex> &vertices, const vector<vector<int>> &edges);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -67,6 +68,8 @@ int main(int argc, char *argv[]) {
         stream >> edges[i][0] >> edges[i][1];
     }
 
+    evenForest(n, edges);
+
     return 0;
 }
 
@@ -85,5 +88,22 @@ int evenForest(const int n, const vector<vector<int>> &edges) {
     auto adjList = adjacencyList(n, edges);
     vector<Vertex> vertices(n);
 
+    DFS(0, vertices, adjList);
+
     return 0;
+}
+
+int DFS(const int root, vector<Vertex> &vertices, const vector<vector<int>> &adjList) {
+    int subTreeSize = 1;
+    vertices[root].visited = true;
+
+    for (auto neighbor : adjList[root]) {
+        if (vertices[neighbor].visited == false) {
+            subTreeSize += DFS(neighbor, vertices, adjList);
+        }
+    }
+    vertices[root].subTreeSize = subTreeSize;
+
+    // cout << "v " << root + 1 << " size " << subTreeSize << endl;
+    return subTreeSize;
 }
