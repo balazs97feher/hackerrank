@@ -42,6 +42,7 @@ class ConsoleReader : public Reader {
 using namespace reader;
 
 vector<int> sieveOfEratosthenes(int maxValue);
+string findWinner(const int value, const vector<int> &primeNumbers);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
     }
 
     vector<int> primeNumbers = sieveOfEratosthenes(maxValue);
-    // for (auto prime : primeNumbers) cout << prime << ' ';
+
+    for (auto value : values) cout << findWinner(value, primeNumbers) << endl;
 
     return 0;
 }
@@ -74,14 +76,24 @@ vector<int> sieveOfEratosthenes(int maxValue) {
     vector<bool> isPrime(maxValue + 1, true);
     isPrime[0] = isPrime[1] = false;
 
-    for (int i = 2; i < maxValue + 1; i++) {
+    for (int i = 2; i <= maxValue; i++) {
         if (isPrime[i] == true) {
-            for (int k = 2; k * i <= maxValue + 1; k++) isPrime[k * i] = false;
+            for (int k = 2; k * i <= maxValue; k++) isPrime[k * i] = false;
         }
     }
 
-    for (int i = 2; i <= maxValue + 1; i++)
+    for (int i = 2; i <= maxValue; i++)
         if (isPrime[i]) primes.push_back(i);
 
     return primes;
+}
+
+string findWinner(const int value, const vector<int> &primeNumbers) {
+    if (primeNumbers.empty()) return "Bob";
+    int numberOfPrimes = 0;
+
+    while (primeNumbers[numberOfPrimes] <= value) numberOfPrimes++;
+
+    if (numberOfPrimes % 2 == 0) return "Bob";
+    return "Alice";
 }
