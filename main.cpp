@@ -48,5 +48,17 @@ int main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
+    int numberOfGames;
+    stringstream stream{reader->readLine()};
+    stream >> numberOfGames;
+
+    vector<int> values(numberOfGames);
+    int maxValue = -1;
+    for (int i = 0; i < numberOfGames; i++) {
+        stream = stringstream(reader->readLine());
+        stream >> values[i];
+        if (values[i] > maxValue) maxValue = values[i];
+    }
+
     return 0;
 }
