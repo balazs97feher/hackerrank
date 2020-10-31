@@ -41,6 +41,8 @@ class ConsoleReader : public Reader {
 
 using namespace reader;
 
+vector<int> sieveOfEratosthenes(int maxValue);
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -60,5 +62,26 @@ int main(int argc, char *argv[]) {
         if (values[i] > maxValue) maxValue = values[i];
     }
 
+    vector<int> primeNumbers = sieveOfEratosthenes(maxValue);
+    // for (auto prime : primeNumbers) cout << prime << ' ';
+
     return 0;
+}
+
+vector<int> sieveOfEratosthenes(int maxValue) {
+    vector<int> primes;
+
+    vector<bool> isPrime(maxValue + 1, true);
+    isPrime[0] = isPrime[1] = false;
+
+    for (int i = 2; i < maxValue + 1; i++) {
+        if (isPrime[i] == true) {
+            for (int k = 2; k * i <= maxValue + 1; k++) isPrime[k * i] = false;
+        }
+    }
+
+    for (int i = 2; i <= maxValue + 1; i++)
+        if (isPrime[i]) primes.push_back(i);
+
+    return primes;
 }
