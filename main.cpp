@@ -4,6 +4,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 using namespace std;
@@ -48,6 +49,8 @@ struct Edge {
     Edge(int s, int e, int w) : start(s), end(e), weight(w){};
 };
 
+uint64_t kruskals(int n, const vector<Edge> &edges);
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -72,6 +75,31 @@ int main(int argc, char *argv[]) {
     sort(edges.begin(), edges.end(), [](const Edge &lhs, const Edge &rhs) { return lhs.weight < rhs.weight; });
 
     // for (auto &edge : edges) cout << edge.start << '-' << edge.end << '-' << edge.weight << endl;
+
+    cout << kruskals(n, edges) << endl;
+
+    return 0;
+}
+
+uint64_t kruskals(int n, const vector<Edge> &edges) {
+    uint64_t cost = 0;
+    unordered_set<int> nodesOfMST;
+    unordered_set<int> edgesOfMST;
+
+    for (int i = 0; nodesOfMST.size() < n; i++) {
+        bool addEdge = false;
+        if (nodesOfMST.find(edges[i].start) != nodesOfMST.end() and
+            nodesOfMST.find(edges[i].end) != nodesOfMST.end()) {
+        } else
+            addEdge = true;
+
+        if (addEdge) {
+            cost += edges[i].weight;
+            edgesOfMST.insert(i);
+            nodesOfMST.insert(edges[i].start);
+            nodesOfMST.insert(edges[i].end);
+        }
+    }
 
     return 0;
 }
