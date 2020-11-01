@@ -49,7 +49,11 @@ struct Edge {
     Edge(int s, int e, int w) : start(s), end(e), weight(w){};
 };
 
-uint64_t kruskals(int n, const vector<Edge> &edges);
+static vector<Edge> edges;
+static int n;
+
+uint64_t kruskals();
+bool inTheSameComponent(const int one, const int other, const unordered_set<int> &edgesOfMST);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -59,10 +63,9 @@ int main(int argc, char *argv[]) {
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
     stringstream stream{reader->readLine()};
-    int n, m;
+    int m;
     stream >> n >> m;
 
-    vector<Edge> edges;
     edges.reserve(m);
 
     for (int i = 0; i < m; i++) {
@@ -76,12 +79,12 @@ int main(int argc, char *argv[]) {
 
     // for (auto &edge : edges) cout << edge.start << '-' << edge.end << '-' << edge.weight << endl;
 
-    cout << kruskals(n, edges) << endl;
+    cout << kruskals() << endl;
 
     return 0;
 }
 
-uint64_t kruskals(int n, const vector<Edge> &edges) {
+uint64_t kruskals() {
     uint64_t cost = 0;
     unordered_set<int> nodesOfMST;
     unordered_set<int> edgesOfMST;
@@ -90,6 +93,7 @@ uint64_t kruskals(int n, const vector<Edge> &edges) {
         bool addEdge = false;
         if (nodesOfMST.find(edges[i].start) != nodesOfMST.end() and
             nodesOfMST.find(edges[i].end) != nodesOfMST.end()) {
+            if (inTheSameComponent(edges[i].start, edges[i].end, edgesOfMST)) addEdge = true;
         } else
             addEdge = true;
 
@@ -101,5 +105,14 @@ uint64_t kruskals(int n, const vector<Edge> &edges) {
         }
     }
 
-    return 0;
+    return cost;
+}
+
+bool inTheSameComponent(const int one, const int other, const unordered_set<int> &edgesOfMST) {
+    vector<bool> visited(n);
+    vector<vector<int>> adjList(n);
+
+    // for (auto)
+
+    return false;
 }
