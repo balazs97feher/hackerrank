@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -77,8 +78,6 @@ int main(int argc, char *argv[]) {
 
     sort(edges.begin(), edges.end(), [](const Edge &lhs, const Edge &rhs) { return lhs.weight < rhs.weight; });
 
-    // for (auto &edge : edges) cout << edge.start << '-' << edge.end << '-' << edge.weight << endl;
-
     cout << kruskals() << endl;
 
     return 0;
@@ -89,11 +88,11 @@ uint64_t kruskals() {
     unordered_set<int> nodesOfMST;
     unordered_set<int> edgesOfMST;
 
-    for (int i = 0; nodesOfMST.size() < n; i++) {
+    for (int i = 0; edgesOfMST.size() < n - 1; i++) {
         bool addEdge = false;
         if (nodesOfMST.find(edges[i].start) != nodesOfMST.end() and
             nodesOfMST.find(edges[i].end) != nodesOfMST.end()) {
-            if (inTheSameComponent(edges[i].start, edges[i].end, edgesOfMST)) addEdge = true;
+            if (!inTheSameComponent(edges[i].start, edges[i].end, edgesOfMST)) addEdge = true;
         } else
             addEdge = true;
 
@@ -109,10 +108,27 @@ uint64_t kruskals() {
 }
 
 bool inTheSameComponent(const int one, const int other, const unordered_set<int> &edgesOfMST) {
-    vector<bool> visited(n);
     vector<vector<int>> adjList(n);
+    for (auto edgeId : edgesOfMST) {
+        adjList[edges[edgeId].start - 1].push_back(edges[edgeId].end - 1);
+        adjList[edges[edgeId].end - 1].push_back(edges[edgeId].start - 1);
+    }
 
-    // for (auto)
+    vector<bool> visited(n);
+    list<int> nodesToCheck{one - 1};
+    visited[one - 1] = true;
+
+    while (!nodesToCheck.empty()) {
+        int currentNode = nodesToCheck.front();
+        nodesToCheck.pop_front();
+        for (auto neighbor : adjList[currentNode]) {
+            if (neighbor == other - 1) return true;
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                nodesToCheck.push_back(neighbor);
+            }
+        }
+    }
 
     return false;
 }
