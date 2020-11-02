@@ -78,9 +78,12 @@ uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount) {
     uint32_t minSize = 2;
     uint32_t minMax = (minSize + maxSize) / 2;
 
-    while (minSize != maxSize) {
+    while (maxSize - minSize > 1) {
+        cout << "min " << minSize << " max " << maxSize << " minmax " << minMax << endl;
         uint32_t maxEdge = turansUpperBound(nodeCount, minMax);
-        if (maxEdge == edgeCount) return minMax;
+        uint32_t maxEdgeLow = turansUpperBound(nodeCount, minMax - 1);
+        cout << "lowedge " << maxEdgeLow << ' ' << "edge " << maxEdge << endl;
+        if (edgeCount > maxEdgeLow && edgeCount <= maxEdge) return minMax;
         if (maxEdge > edgeCount)
             maxSize = minMax;
         else
@@ -88,6 +91,8 @@ uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount) {
         minMax = (minSize + maxSize) / 2;
     }
 
-    if (turansUpperBound(nodeCount, minMax) == edgeCount) return minMax;
-    return minMax - 1;
+    auto upperBound = turansUpperBound(nodeCount, minSize);
+    cout << "upperBound " << upperBound << "  minsize " << minSize << endl;
+    if (turansUpperBound(nodeCount, minSize) >= edgeCount) return minSize;
+    return maxSize;
 }
