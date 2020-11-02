@@ -42,6 +42,7 @@ class ConsoleReader : public Reader {
 using namespace reader;
 
 uint32_t turansUpperBound(uint32_t nodeCount, uint32_t cliqueSize);
+uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount);
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
@@ -50,6 +51,17 @@ int main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
+    int t;
+    stringstream stream{reader->readLine()};
+    stream >> t;
+
+    for (int i = 0; i < t; i++) {
+        stream = stringstream{reader->readLine()};
+        uint32_t n, m;
+        stream >> n >> m;
+        cout << minMaxClique(n, m) << endl;
+    }
+
     return 0;
 }
 
@@ -57,6 +69,25 @@ int main(int argc, char *argv[]) {
 // Maximum number of edges
 uint32_t turansUpperBound(uint32_t nodeCount, uint32_t cliqueSize) {
     uint32_t r = nodeCount % cliqueSize;
-    return (cliqueSize - 1) / (2 * cliqueSize) * nodeCount * nodeCount -
+    return (cliqueSize - 1) * nodeCount * nodeCount / (2 * cliqueSize) -
            (r * (cliqueSize - r) / (2 * cliqueSize));
+}
+
+uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount) {
+    uint32_t maxSize = nodeCount;
+    uint32_t minSize = 2;
+    uint32_t minMax = (minSize + maxSize) / 2;
+
+    while (minSize != maxSize) {
+        uint32_t maxEdge = turansUpperBound(nodeCount, minMax);
+        if (maxEdge == edgeCount) return minMax;
+        if (maxEdge > edgeCount)
+            maxSize = minMax;
+        else
+            minSize = minMax;
+        minMax = (minSize + maxSize) / 2;
+    }
+
+    if (turansUpperBound(nodeCount, minMax) == edgeCount) return minMax;
+    return minMax - 1;
 }
