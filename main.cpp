@@ -51,16 +51,18 @@ int main(int argc, char *argv[]) {
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
 
-    int t;
-    stringstream stream{reader->readLine()};
-    stream >> t;
+    // int t;
+    // stringstream stream{reader->readLine()};
+    // stream >> t;
 
-    for (int i = 0; i < t; i++) {
-        stream = stringstream{reader->readLine()};
-        uint32_t n, m;
-        stream >> n >> m;
-        cout << minMaxClique(n, m) << endl;
-    }
+    // for (int i = 0; i < t; i++) {
+    //     stream = stringstream{reader->readLine()};
+    //     uint32_t n, m;
+    //     stream >> n >> m;
+    //     cout << minMaxClique(n, m) << endl;
+    // }
+
+    cout << turansUpperBound(19, 13) << endl;
 
     return 0;
 }
@@ -69,8 +71,8 @@ int main(int argc, char *argv[]) {
 // Maximum number of edges
 uint32_t turansUpperBound(uint32_t nodeCount, uint32_t cliqueSize) {
     uint32_t r = nodeCount % cliqueSize;
-    return (cliqueSize - 1) * nodeCount * nodeCount / (2 * cliqueSize) -
-           (r * (cliqueSize - r) / (2 * cliqueSize));
+    return (float(cliqueSize) - 1) * nodeCount * nodeCount / (2 * cliqueSize) -
+           (float(r) * (cliqueSize - r) / (2 * cliqueSize));
 }
 
 uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount) {
@@ -79,10 +81,8 @@ uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount) {
     uint32_t minMax = (minSize + maxSize) / 2;
 
     while (maxSize - minSize > 1) {
-        cout << "min " << minSize << " max " << maxSize << " minmax " << minMax << endl;
         uint32_t maxEdge = turansUpperBound(nodeCount, minMax);
         uint32_t maxEdgeLow = turansUpperBound(nodeCount, minMax - 1);
-        cout << "lowedge " << maxEdgeLow << ' ' << "edge " << maxEdge << endl;
         if (edgeCount > maxEdgeLow && edgeCount <= maxEdge) return minMax;
         if (maxEdge > edgeCount)
             maxSize = minMax;
@@ -91,8 +91,6 @@ uint32_t minMaxClique(uint32_t nodeCount, uint32_t edgeCount) {
         minMax = (minSize + maxSize) / 2;
     }
 
-    auto upperBound = turansUpperBound(nodeCount, minSize);
-    cout << "upperBound " << upperBound << "  minsize " << minSize << endl;
     if (turansUpperBound(nodeCount, minSize) >= edgeCount) return minSize;
     return maxSize;
 }
