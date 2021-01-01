@@ -7,39 +7,37 @@
 
 using namespace std;
 
-namespace reader {
-class Reader {
-   public:
-    Reader() = default;
-    virtual string readLine() = 0;
-};
+{
+   class Reader {
+      public:
+       Reader() = default;
+       virtual string readLine() = 0;
+   };
 
-class FileReader : public Reader {
-    std::ifstream inputFile;
+   class FileReader : public Reader {
+       ifstream inputFile;
 
-   public:
-    FileReader(const string fileName) : Reader() {
-        inputFile = ifstream(fileName);
-    }
-    string readLine() override {
-        string line;
-        getline(inputFile, line);
-        return line;
-    }
-};
+      public:
+       FileReader(const string fileName) : Reader() {
+           inputFile = ifstream(fileName);
+       }
+       string readLine() override {
+           string line;
+           getline(inputFile, line);
+           return line;
+       }
+   };
 
-class ConsoleReader : public Reader {
-   public:
-    ConsoleReader() = default;
-    string readLine() override {
-        string line;
-        getline(cin, line);
-        return line;
-    }
-};
-}  // namespace reader
-
-using namespace reader;
+   class ConsoleReader : public Reader {
+      public:
+       ConsoleReader() = default;
+       string readLine() override {
+           string line;
+           getline(cin, line);
+           return line;
+       }
+   };
+}
 
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
