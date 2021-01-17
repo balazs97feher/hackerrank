@@ -3,6 +3,7 @@
 #include <memory>
 #include <algorithm>
 #include <sstream>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -61,19 +62,31 @@ int main(int argc, char* argv[]) {
     stream = stringstream{ reader->readLine() };
     for (int i = 0; i < m; i++) stream >> player[i];
 
+    auto last_ranked = unique(ranked.begin(), ranked.end());
+    ranked.erase(last_ranked, ranked.end());
+
+    unordered_map<int, int> cache;
     vector<int> ranks;
     ranks.reserve(m);
-    for (auto score : player) {
-        vector<int> ranked_copy_inv(ranked.rbegin(), ranked.rend());
-        auto where = lower_bound(ranked_copy_inv.begin(), ranked_copy_inv.end(), score);
-        auto place = ranked_copy_inv.insert(where, score);
 
-        //auto last = unique(place, ranked_copy_inv.end());
-        for (auto a : ranked_copy_inv) cout << a << ' ';
-        cout << endl;
+    vector<int> ranked_copy_inv(ranked.rbegin(), ranked.rend());
+    auto where = ranked_copy_inv.begin();
+
+    for (auto score : player) {
+        auto cached = cache.find(score);
+        if (cached != cache.end()) {
+            ranks.push_back(cached->second);
+            continue;
+        }
+
+        where = upper_bound(where, ranked_copy_inv.end(), score);
+
+        int place = ranked_copy_inv.end() - where + 1;
+        ranks.push_back(place);
+        cache.insert({ score, place });
     }
 
-    //for (auto rank : ranks) cout << rank << endl;
+    for (auto rank : ranks) cout << rank << endl;
 
     return 0;
 }
