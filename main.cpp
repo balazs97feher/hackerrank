@@ -60,10 +60,27 @@ int main(int argc, char* argv[]) {
     const int sum = queen.row + queen.col;
     const int diff = queen.row - queen.col;
 
-    Field closestNorth{ n + 1, queen.col }, closestNorthEast{ n + 1, n + 1 - diff },
-        closestEast{ queen.row, n + 1 }, closestSouthEast{ sum - n - 1, n + 1 },
-        closestSouth{ 0, queen.col }, closestSouthWest{ 0, 0 - diff },
-        closestWest{ queen.row, 0 }, closestNorthWest{ n + 1, sum - n - 1 };
+    Field closestNorth{ n + 1, queen.col }, closestEast{ queen.row, n + 1 },
+        closestSouth{ 0, queen.col }, closestWest{ queen.row, 0 };
+    Field closestNorthEast, closestSouthEast, closestSouthWest, closestNorthWest;
+
+    if (sum < n) {
+        closestNorthWest = Field{ sum, 0 };
+        closestSouthEast = Field{ 0, sum };
+    }
+    else {
+        closestNorthWest = Field{ n + 1, sum - n - 1 };
+        closestSouthEast = Field{ sum - n - 1, n + 1 };
+    }
+
+    if (diff > 0) {
+        closestSouthWest = Field{ 0 + diff, 0 };
+        closestNorthEast = Field{ n + 1, n + 1 - diff };
+    }
+    else {
+        closestSouthWest = Field{ 0, 0 - diff };
+        closestNorthEast = Field{ n + 1 + diff, n + 1 };
+    }
 
     for (int i = 0; i < k; i++) {
         stream = stringstream{ reader->readLine() };
