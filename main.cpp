@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -40,15 +41,15 @@ class ConsoleReader : public Reader {
 
 class Node {
 public:
-    Node(const int id) : id(id), left(nullptr), right(nullptr) {}
-    int id;
+    Node(const int id, const int depth) : id(id), depth(depth), left(nullptr), right(nullptr) {}
+    int id, depth;
     Node* left;
     Node* right;
 };
 
 vector<unique_ptr<Node>> buildBinaryTree(vector<vector<int>> indexes) {
     vector<unique_ptr<Node>> tree;
-    tree.push_back(make_unique<Node>(1));
+    tree.push_back(make_unique<Node>(1, 1));
 
     queue<Node*> toBeGrown;
     toBeGrown.push(tree.back().get());
@@ -58,13 +59,13 @@ vector<unique_ptr<Node>> buildBinaryTree(vector<vector<int>> indexes) {
         toBeGrown.pop();
         if (indexes[i][0] == -1) nextNode->left = nullptr;
         else {
-            tree.push_back(make_unique<Node>(indexes[i][0]));
+            tree.push_back(make_unique<Node>(indexes[i][0], nextNode->depth + 1));
             nextNode->left = tree.back().get();
             toBeGrown.push(nextNode->left);
         }
         if (indexes[i][1] == -1) nextNode->right = nullptr;
         else {
-            tree.push_back(make_unique<Node>(indexes[i][1]));
+            tree.push_back(make_unique<Node>(indexes[i][1], nextNode->depth + 1));
             nextNode->right = tree.back().get();
             toBeGrown.push(nextNode->right);
         }
@@ -76,8 +77,8 @@ vector<unique_ptr<Node>> buildBinaryTree(vector<vector<int>> indexes) {
 void traverseSubtree(vector<int>& order, Node* root) {
     if (!root) return;
 
-    order.push_back(root->id);
     traverseSubtree(order, root->left);
+    order.push_back(root->id);
     traverseSubtree(order, root->right);
 }
 
@@ -121,7 +122,22 @@ int main(int argc, char *argv[]) {
 
     auto tree = buildBinaryTree(indices);
 
-    for (auto e : traverseInOrder(tree)) cout << e << endl;
+    auto maxDepthNode = max_element(tree.begin(), tree.end(), [](const unique_ptr<Node>& lhs, const unique_ptr<Node>& rhs) {
+            return lhs->depth < rhs->depth;
+        });
+    const int maxDepth = (*maxDepthNode)->depth;
+
+    for (const auto query : queries) {
+        for (int depth = query; depth < maxDepth; depth += query) {
+            for_each(tree.begin(), tree.end(), [depth](unique_ptr<Node>& node) {
+                if (node->depth == depth) {
+                    swap(node->left, node->right);
+                    }
+                });
+        }
+        for (const auto e : traverseInOrder(tree)) cout << e << ' ';
+        cout << endl;
+    }
 
     return 0;
 }
