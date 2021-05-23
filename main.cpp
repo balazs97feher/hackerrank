@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -37,12 +38,79 @@ class ConsoleReader : public Reader {
     }
 };
 
+class Node {
+public:
+    Node(const int id) : id(id), left(nullptr), right(nullptr) {}
+    int id;
+    Node* left;
+    Node* right;
+};
+
+vector<unique_ptr<Node>> buildBinaryTree(vector<vector<int>> indexes) {
+    vector<unique_ptr<Node>> tree;
+    tree.push_back(make_unique<Node>(1));
+
+    queue<Node*> toBeGrown;
+    toBeGrown.push(tree.back().get());
+
+    for (int i = 0; i < indexes.size(); i++) {
+        auto nextNode = toBeGrown.front();
+        toBeGrown.pop();
+        if (indexes[i][0] == -1) nextNode->left = nullptr;
+        else {
+            tree.push_back(make_unique<Node>(indexes[i][0]));
+            nextNode->left = tree.back().get();
+            toBeGrown.push(nextNode->left);
+        }
+        if (indexes[i][1] == -1) nextNode->right = nullptr;
+        else {
+            tree.push_back(make_unique<Node>(indexes[i][1]));
+            nextNode->right = tree.back().get();
+            toBeGrown.push(nextNode->right);
+        }
+    }
+
+    return tree;
+}
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
         reader = unique_ptr<FileReader>(new FileReader(argv[1]));
     else
         reader = unique_ptr<ConsoleReader>(new ConsoleReader);
+
+    int nodeCount, queryCount;
+    stringstream stream{ reader->readLine() };
+    stream >> nodeCount;
+
+    vector<vector<int>> indices(nodeCount);
+
+    for (int i = 0; i < nodeCount; i++) {
+        indices[i].resize(2);
+        stream = stringstream{ reader->readLine() };
+        stream >> indices[i][0] >> indices[i][1];
+    }
+
+    stream = stringstream{ reader->readLine() };
+    stream >> queryCount;
+    vector<int> queries(queryCount);
+
+    for (auto& q : queries) {
+        stream = stringstream{ reader->readLine() };
+        stream >> q;
+    }
+
+    auto tree = buildBinaryTree(indices);
+
+    vector<int> leftSide{ 1 };
+    auto traverser = tree[0].get();
+    while (traverser->left) {
+        leftSide.push_back(traverser->left->id);
+        traverser = traverser->left;
+    }
+
+    for (auto e : leftSide) cout << e << endl;
 
     return 0;
 }
