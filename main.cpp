@@ -73,6 +73,24 @@ vector<unique_ptr<Node>> buildBinaryTree(vector<vector<int>> indexes) {
     return tree;
 }
 
+void traverseSubtree(vector<int>& order, Node* root) {
+    if (!root) return;
+
+    order.push_back(root->id);
+    traverseSubtree(order, root->left);
+    traverseSubtree(order, root->right);
+}
+
+vector<int> traverseInOrder(const vector<unique_ptr<Node>>& tree) {
+    vector<int> order;
+
+    traverseSubtree(order, tree[0]->left);
+    order.push_back(tree[0]->id);
+    traverseSubtree(order, tree[0]->right);
+
+    return order;
+}
+
 int main(int argc, char *argv[]) {
     unique_ptr<Reader> reader;
     if (argc == 2)
@@ -103,14 +121,7 @@ int main(int argc, char *argv[]) {
 
     auto tree = buildBinaryTree(indices);
 
-    vector<int> leftSide{ 1 };
-    auto traverser = tree[0].get();
-    while (traverser->left) {
-        leftSide.push_back(traverser->left->id);
-        traverser = traverser->left;
-    }
-
-    for (auto e : leftSide) cout << e << endl;
+    for (auto e : traverseInOrder(tree)) cout << e << endl;
 
     return 0;
 }
