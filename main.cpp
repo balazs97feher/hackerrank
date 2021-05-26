@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <queue>
 #include <unordered_map>
 
 using namespace std;
@@ -39,29 +40,22 @@ class ConsoleReader : public Reader {
     }
 };
 
-vector<uint64_t> heights;
-unordered_map<string, uint64_t> cache;
+uint64_t getMaxArea(const vector<uint64_t> &heights, const int64_t startIndex) {
+    auto index = startIndex + 1;
+    auto area = heights[startIndex];
+    
+    while (index < heights.size() && heights[index] >= heights[startIndex]) {
+        area += heights[startIndex];
+        index++;
+    }
 
-uint64_t getMinHeight(const uint64_t start, const uint64_t end) {
-    auto minHeight = heights[start];
-    for (size_t i = start; i <= end; i++) if (minHeight > heights[i]) minHeight = heights[i];
-    return minHeight;
-}
+    index = startIndex - 1;
+    while (index >= 0 && heights[index] >= heights[startIndex]) {
+        area += heights[startIndex];
+        index--;
+    }
 
-uint64_t getArea(const uint64_t start, const uint64_t end) {
-    return getMinHeight(start, end) * (end - start + 1);
-}
-
-uint64_t getMaxArea(const uint64_t start, const uint64_t end) {
-    const string key = to_string(start) + '_' + to_string(end);
-    const auto cachedValue = cache.find(key);
-    if (cachedValue != cache.end()) return cachedValue->second;
-
-    if (start == end) return heights[start];
-    const auto maxArea = max(max(getArea(start, end), getMaxArea(start + 1, end)), max(getMaxArea(start, end - 1), getArea(start, end)));
-    cache.insert({ key, maxArea });
-
-    return maxArea;
+    return area;
 }
 
 int main(int argc, char *argv[]) {
@@ -75,11 +69,30 @@ int main(int argc, char *argv[]) {
     stringstream stream{ reader->readLine() };
     stream >> n;
     
+    vector<uint64_t> heights;
     heights.resize(n);
-    stream = stringstream{ reader->readLine() };
-    for (auto& h : heights) stream >> h;
 
-    cout << getMaxArea(0, n - 1);
+    auto compare = [&heights](const int64_t lhs, const int64_t rhs) {
+        return heights[lhs] < heights[rhs];
+    };
+    priority_queue < int64_t, vector<int64_t>, decltype(compare)> heightQueue(compare);
+
+    stream = stringstream{ reader->readLine() };
+    for (size_t i = 0; i < n; i++)
+    {
+        stream >> heights[i];
+        heightQueue.push(i);
+    }
+
+    uint64_t maxArea = 0;
+    while (!heightQueue.empty()) {
+        const auto startIndex = heightQueue.top();
+        heightQueue.pop();
+        const auto area = getMaxArea(heights, startIndex);
+        if (area > maxArea) maxArea = area;
+    }
+
+    cout << maxArea;
 
     return 0;
 }
