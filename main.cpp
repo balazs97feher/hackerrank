@@ -4,8 +4,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <list>
-#include <unordered_set>
 
 using namespace std;
 
@@ -39,30 +37,23 @@ public:
     }
 };
 
-auto findSet(list<unordered_set<uint16_t>>& sets, const uint16_t s) {
-    for (auto it = sets.begin(); it != sets.end(); it++) {
-        if (it->find(s) != it->end()) return it;
-    }
+int findParent(int* parents, const int elem) {
+    auto iter = elem;
+    while (parents[iter] > 0) iter = parents[iter];
 
-    return sets.end();
+    // collapse find
+    if (iter != elem) return parents[elem] = iter;
+    return elem;
 }
 
-void store(list<unordered_set<uint16_t>>& sets, const uint16_t s, const uint16_t e) {
-    auto setOfS = findSet(sets, s);
-    auto setOfE = findSet(sets, e);
-
-    if (setOfE == sets.end() && setOfS == sets.end()) {
-        sets.push_back({ s, e });
+void takeUnion(int* parents, const int ps, const int pe) {
+    if (parents[ps] < parents[pe]) {
+        parents[ps] += parents[pe];
+        parents[pe] = ps;
     }
-    else if (setOfE == sets.end()) {
-        setOfS->insert(e);
-    }
-    else if (setOfS == sets.end()) {
-        setOfE->insert(s);
-    }
-    else if (setOfS != setOfE) {
-        for (const auto elem : *setOfE) setOfS->insert(elem);
-        sets.erase(setOfE);
+    else {
+        parents[pe] += parents[ps];
+        parents[ps] = pe;
     }
 }
 
@@ -78,26 +69,32 @@ int main(int argc, char* argv[]) {
     uint16_t n;
     stream >> n;
 
-    list<unordered_set<uint16_t>> sets;
+    int parents[30001];
+    for (auto& p : parents) p = -1;
 
     while (n-- > 0) {
         uint16_t s, e;
         stream = stringstream{ reader->readLine() };
         stream >> s >> e;
 
-        store(sets, s, e);
+        const auto ps = findParent(parents, s);
+        const auto pe = findParent(parents, e);
+        if (ps != pe) {
+            takeUnion(parents, ps, pe);
+        }
     }
 
-    uint16_t min = 30000;
-    uint16_t max = 0;
+    int min = -30000;
+    int max = 0;
 
-    for (const auto& s : sets) {
-        const auto setSize = s.size();
-        if (setSize > max) max = setSize;
-        if (setSize < min && setSize > 1) min = setSize;
+    for (const auto p : parents) {
+        if (p < -1) {
+            if (p > min) min = p;
+            if (p < max) max = p;
+        }
     }
 
-    cout << min << ' ' << max << endl;
+    cout << abs(min) << ' ' << abs(max) << endl;
 
     return 0;
 }
