@@ -52,10 +52,10 @@ public:
     }
 
     void mergeSets(const T a, const T b) {
-        if (a == b) return;
-
         const auto pa = parentOf(a);
         const auto pb = parentOf(b);
+
+        if (pa == pb) return;
 
         if (pa < pb) {
             parents[pa] += parents[pb];
