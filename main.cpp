@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -52,23 +53,18 @@ char pairOf(const char c) {
 }
 
 bool isBalanced(const string s) {
-    if (s.empty()) return true;
-    if (s.size() == 1) return false;
+    stack<char> brackets;
 
-    int idx = 1;
-
-    if (pairOf(s[0] == 0)) return false;
-
-    for (size_t idx = 1; idx < s.size(); idx++) {
-        if (s[idx] == pairOf(s[0])) {
-            const string leftPart = s.substr(1, idx - 1);
-            const string rightPart = s.substr(idx + 1, s.size() - idx - 1);
-
-            if (isBalanced(leftPart) && isBalanced(rightPart)) return true;
+    for (const auto b : s) {
+        if (pairOf(b)) brackets.push(b);
+        else {
+            if (brackets.empty()) return false;
+            if (pairOf(brackets.top()) == b) brackets.pop();
+            else return false;
         }
     }
-    
-    return false;
+
+    return brackets.empty();
 }
 
 int main(int argc, char *argv[]) {
